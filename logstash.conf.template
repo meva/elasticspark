@@ -1,0 +1,26 @@
+input {
+	twitter {
+        consumer_key => "$CONSUMER_KEY"
+        consumer_secret => "$CONSUMER_SECRET"
+        oauth_token => "$OAUTH_Token"
+        oauth_token_secret => "$OAUTH_TOKEN_SECRET"
+        type => "twitter"
+        keywords => ["hillary", "clinton", "bernie", "sanders",  "trump", "drumpf", "election", "candidate"]
+	}
+}
+filter {
+  mutate {
+    add_field => { "bigram_message" => "%{message}" }
+    add_field => { "raw_message" => "%{message}" }
+  }
+}
+output {
+    stdout {codec => json}
+#     	file {
+#	  path => '/tmp/election_tweets1.json'
+#        }
+	elasticsearch {
+		hosts => ["localhost:9200"]
+		index => "election.tweets.%{+YYYY.MM.dd}"
+	}
+}
